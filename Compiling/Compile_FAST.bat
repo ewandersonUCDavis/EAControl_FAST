@@ -28,8 +28,8 @@ REM ----------------------------------------------------------------------------
 REM -------------------- LOCAL VARIABLES ---------------------------------------
 REM ----------------------------------------------------------------------------
 
- SET ROOT_NAME=FAST_iwin32
-REM SET ROOT_NAME=FAST_EAControl
+REM SET ROOT_NAME=FAST_iwin32
+ SET ROOT_NAME=FAST_EAControl
 
 SET COMPOPTS=/threads  /O2 /inline:speed /traceback /Qzero /Qsave /real_size:32 /assume:byterecl
 rem SET LINKOPTS=/link /stack:64000000
@@ -106,9 +106,9 @@ SET FAST_Files=%FAST_Files%  "%FAST_LOC%\FAST2ADAMS.f90"
 
 IF /I "%1"=="DLL" GOTO dllFiles
 
-SET FAST_Files=%FAST_Files%  "%FAST_LOC%\PitchCntrl_ACH.f90"
+REM SET FAST_Files=%FAST_Files%  "%FAST_LOC%\PitchCntrl_ACH.f90"
 SET FAST_Files=%FAST_Files%  "%FAST_LOC%\UserSubs.f90"
-SET FAST_Files=%FAST_Files%  "%FAST_LOC%\UserVSCont_KP.f90"
+REM SET FAST_Files=%FAST_Files%  "%FAST_LOC%\UserVSCont_KP.f90"
 
 GOTO endFASTfiles
 
