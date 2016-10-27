@@ -2631,3 +2631,16 @@ LOGICAL                      :: GenTiStr                                        
 
 END MODULE TurbCont
 !=======================================================================
+!=======================================================================
+MODULE DerateControl
+
+   ! This MODULE stores input variables for turbine derate control.
+   
+USE                             Precision
+
+   
+REAL(ReKi)                   :: TimeDRStart                                         ! Time for turbine to initiate derating
+REAL(ReKi)                   :: TimeDREnd                                         	! Time for turbine to start returning to full rated operation
+REAL(ReKi)                   :: DerateFactor                                        ! Ammount turbine will be derated (fraction of 1)
+
+END MODULE DerateControl

@@ -78,30 +78,30 @@ CHARACTER(1024), INTENT(IN ) :: DirRoot                                         
 
  ! Local Variables:
 
-REAL(4)                      :: ElapTime                                        ! Elapsed time since the last call to the controller, sec.
-REAL(4)	                	 :: GenSpeedF                                       ! Filtered HSS (generator) speed, rad/s.
-REAL(4)                      :: GK                                              ! Current value of the gain correction factor, used in the gain scheduling law of the pitch controller, (-).
-REAL(4), SAVE                :: IntSpdErr                                       ! Current integral of speed error w.r.t. time, rad.
-REAL(4), SAVE                :: LastTimePC                                      ! Last time the pitch  controller was called, sec.
-REAL(4), PARAMETER           :: OnePlusEps    = 1.0 + EPSILON(OnePlusEps)       ! The number slighty greater than unity in single precision.
-REAL(4), PARAMETER           :: PC_DT         = 0.00125  !JASON:THIS CHANGED FOR ITI BARGE:      0.0001                    ! Communication interval for pitch  controller, sec.
-REAL(4), PARAMETER           :: PC_KI         =       0.008068634               ! Integral gain for pitch controller at rated pitch (zero), (-).
-REAL(4), PARAMETER           :: PC_KK         =       0.1099965                 ! Pitch angle were the the derivative of the aerodynamic power w.r.t. pitch has increased by a factor of two relative to the derivative at rated pitch (zero), rad.
-REAL(4), PARAMETER           :: PC_KP         =       0.01882681                ! Proportional gain for pitch controller at rated pitch (zero), sec.
-REAL(4), PARAMETER           :: PC_MaxPit     =       1.570796                  ! Maximum pitch setting in pitch controller, rad.
-REAL(4), PARAMETER           :: PC_MaxRat     =       0.1396263                 ! Maximum pitch  rate (in absolute value) in pitch  controller, rad/s.
-REAL(4), SAVE           	 :: PC_MinPit                            			! Minimum pitch setting in pitch controller, rad.
-REAL(4), SAVE                :: PitCom    (3)                                   ! Commanded pitch of each blade the last time the controller was called, rad.
-REAL(4)           			 :: PC_RefSpd                         				! Desired (reference) HSS speed for pitch controller, rad/s.
-REAL(4)                      :: PitComI                                         ! Integral term of command pitch, rad.
-REAL(4)                      :: PitComP                                         ! Proportional term of command pitch, rad.
-REAL(4)                      :: PitComT                                         ! Total command pitch based on the sum of the proportional and integral terms, rad.
-REAL(4)                      :: PitRate   (3)                                   ! Pitch rates of each blade based on the current pitch angles and current pitch command, rad/s.
-REAL(4)                      :: SpdErr                                          ! Current speed error, rad/s.
+REAL(ReKi)                      :: ElapTime                                        ! Elapsed time since the last call to the controller, sec.
+REAL(ReKi)	                	 :: GenSpeedF                                       ! Filtered HSS (generator) speed, rad/s.
+REAL(ReKi)                      :: GK                                              ! Current value of the gain correction factor, used in the gain scheduling law of the pitch controller, (-).
+REAL(ReKi), SAVE                :: IntSpdErr                                       ! Current integral of speed error w.r.t. time, rad.
+REAL(ReKi), SAVE                :: LastTimePC                                      ! Last time the pitch  controller was called, sec.
+REAL(ReKi), PARAMETER           :: OnePlusEps    = 1.0 + EPSILON(OnePlusEps)       ! The number slighty greater than unity in single precision.
+REAL(ReKi), PARAMETER           :: PC_DT         = 0.00125  !JASON:THIS CHANGED FOR ITI BARGE:      0.0001                    ! Communication interval for pitch  controller, sec.
+REAL(ReKi), PARAMETER           :: PC_KI         =       0.008068634               ! Integral gain for pitch controller at rated pitch (zero), (-).
+REAL(ReKi), PARAMETER           :: PC_KK         =       0.1099965                 ! Pitch angle were the the derivative of the aerodynamic power w.r.t. pitch has increased by a factor of two relative to the derivative at rated pitch (zero), rad.
+REAL(ReKi), PARAMETER           :: PC_KP         =       0.01882681                ! Proportional gain for pitch controller at rated pitch (zero), sec.
+REAL(ReKi), PARAMETER           :: PC_MaxPit     =       1.570796                  ! Maximum pitch setting in pitch controller, rad.
+REAL(ReKi), PARAMETER           :: PC_MaxRat     =       0.1396263                 ! Maximum pitch  rate (in absolute value) in pitch  controller, rad/s.
+REAL(ReKi), SAVE           	 :: PC_MinPit                            			! Minimum pitch setting in pitch controller, rad.
+REAL(ReKi), SAVE                :: PitCom    (3)                                   ! Commanded pitch of each blade the last time the controller was called, rad.
+REAL(ReKi)           			 :: PC_RefSpd                         				! Desired (reference) HSS speed for pitch controller, rad/s.
+REAL(ReKi)                      :: PitComI                                         ! Integral term of command pitch, rad.
+REAL(ReKi)                      :: PitComP                                         ! Proportional term of command pitch, rad.
+REAL(ReKi)                      :: PitComT                                         ! Total command pitch based on the sum of the proportional and integral terms, rad.
+REAL(ReKi)                      :: PitRate   (3)                                   ! Pitch rates of each blade based on the current pitch angles and current pitch command, rad/s.
+REAL(ReKi)                      :: SpdErr                                          ! Current speed error, rad/s.
 LOGICAL                   	 :: Initialize        = .TRUE.                                 ! A status flag set by the simulation as follows: 0 if this is the first call, 1 for all subsequent time steps, -1 if this is the final call at the end of the simulation.
-INTEGER(4)                   :: K                                               ! Loops through blades.
-REAL(4)                      :: VS_Rgn2K 										! Not used in this subroutine, but must be declared because it's an output of subroutine getControlParameters().  
-REAL(4)                      :: VS_RtPwr										! Not used in this subroutine, but must be declared because it's an output of subroutine getControlParameters().
+INTEGER(ReKi)                   :: K                                               ! Loops through blades.
+REAL(ReKi)                      :: VS_Rgn2K 										! Not used in this subroutine, but must be declared because it's an output of subroutine getControlParameters().  
+REAL(ReKi)                      :: VS_RtPwr										! Not used in this subroutine, but must be declared because it's an output of subroutine getControlParameters().
 
 !=======================================================================
    !Initialize variables:
@@ -647,30 +647,30 @@ REAL(ReKi), INTENT(IN )      :: ZTime                                           
 CHARACTER(1024), INTENT(IN ) :: DirRoot                                         ! The name of the root file including the full path to the current working directory.  This may be useful if you want this routine to write a permanent record of what it does to be stored with the simulation results: the results should be stored in a file whose name (including path) is generated by appending any suitable extension to DirRoot.
 
 ! Local Variables:
-REAL(4)                      :: ElapTime                                        ! Elapsed time since the last call to the controller, sec.
-REAL(4)                		 :: GenSpeedF                                       ! Filtered HSS (generator) speed, rad/s.
-REAL(4), SAVE                :: LastGenTrq                                      ! Commanded electrical generator torque the last time the controller was called, N-m.
-REAL(4), SAVE                :: LastTimeVS                                  	! Last time the torque controller was called, sec.
-REAL(4), PARAMETER           :: OnePlusEps    = 1.0 + EPSILON(OnePlusEps)       ! The number slighty greater than unity in single precision.
-REAL(4)                      :: TrqRate                                         ! Torque rate based on the current and last torque commands, N-m/s.
-REAL(4), PARAMETER           :: VS_Rgn3MP     =       0.01745329                ! Minimum pitch angle at which the torque is computed as if we are in region 3 regardless of the generator speed, rad. -- chosen to be 1.0 degree above PC_MinPit
-REAL(4), PARAMETER           :: VS_CtInSp     =      70.16224                   ! Transitional generator speed (HSS side) between regions 1 and 1 1/2, rad/s.
-REAL(4), PARAMETER           :: VS_DT         = 0.00125  !JASON:THIS CHANGED FOR ITI BARGE:      0.0001                    ! Communication interval for torque controller, sec.
-REAL(4), PARAMETER           :: VS_MaxRat     =   15000.0                       ! Maximum torque rate (in absolute value) in torque controller, N-m/s.
-REAL(4), PARAMETER           :: VS_MaxTq      =   47402.91                      ! Maximum generator torque in Region 3 (HSS side), N-m. -- chosen to be 10% above VS_RtTq = 43.09355kNm
-REAL(4)           			 :: VS_Rgn2K                               			! Generator torque constant in Region 2 (HSS side), N-m/(rad/s)^2.
-REAL(4), PARAMETER           :: VS_Rgn2Sp     =      91.21091                   ! Transitional generator speed (HSS side) between regions 1 1/2 and 2, rad/s.
-REAL(4)           			 :: VS_RtGnSp                         				! Rated generator speed (HSS side), rad/s. -- cequal to 99% of PC_RefSpd
-REAL(4)           			 :: VS_RtPwr                            			! Rated generator generator power in Region 3, Watts. -- chosen to be 5MW divided by the electrical generator efficiency of 94.4%
-REAL(4)                		 :: VS_Slope15                                      ! Torque/speed slope of region 1 1/2 cut-in torque ramp , N-m/(rad/s).
-REAL(4)                		 :: VS_Slope25                                      ! Torque/speed slope of region 2 1/2 induction generator, N-m/(rad/s).
-REAL(4), PARAMETER           :: VS_SlPc       =      10.0                       ! Rated generator slip percentage in Region 2 1/2, %.
-REAL(4)                		 :: VS_SySp                                         ! Synchronous speed of region 2 1/2 induction generator, rad/s.
-REAL(4)                		 :: VS_TrGnSp                                       ! Transitional generator speed (HSS side) between regions 2 and 2 1/2, rad/s.
-REAL(4)                		 :: PC_RefSpd 										! Desired (reference) HSS speed for pitch controller, rad/s.
-REAL(4)                		 :: PC_MinPit										! Minimum pitch setting in pitch controller, rad.
-REAL(4)    					 :: BlPitchCom                  					! Commanded blade pitch angle for blade 1 (demand pitch angle), rad.
-! REAL(4), PARAMETER           :: R2D           =      57.295780                  ! Factor to convert radians to degrees.
+REAL(ReKi)                      :: ElapTime                                        ! Elapsed time since the last call to the controller, sec.
+REAL(ReKi)                		 :: GenSpeedF                                       ! Filtered HSS (generator) speed, rad/s.
+REAL(ReKi), SAVE                :: LastGenTrq                                      ! Commanded electrical generator torque the last time the controller was called, N-m.
+REAL(ReKi), SAVE                :: LastTimeVS                                  	! Last time the torque controller was called, sec.
+REAL(ReKi), PARAMETER           :: OnePlusEps    = 1.0 + EPSILON(OnePlusEps)       ! The number slighty greater than unity in single precision.
+REAL(ReKi)                      :: TrqRate                                         ! Torque rate based on the current and last torque commands, N-m/s.
+REAL(ReKi), PARAMETER           :: VS_Rgn3MP     =       0.01745329                ! Minimum pitch angle at which the torque is computed as if we are in region 3 regardless of the generator speed, rad. -- chosen to be 1.0 degree above PC_MinPit
+REAL(ReKi), PARAMETER           :: VS_CtInSp     =      70.16224                   ! Transitional generator speed (HSS side) between regions 1 and 1 1/2, rad/s.
+REAL(ReKi), PARAMETER           :: VS_DT         = 0.00125  !JASON:THIS CHANGED FOR ITI BARGE:      0.0001                    ! Communication interval for torque controller, sec.
+REAL(ReKi), PARAMETER           :: VS_MaxRat     =   15000.0                       ! Maximum torque rate (in absolute value) in torque controller, N-m/s.
+REAL(ReKi), PARAMETER           :: VS_MaxTq      =   47402.91                      ! Maximum generator torque in Region 3 (HSS side), N-m. -- chosen to be 10% above VS_RtTq = 43.09355kNm
+REAL(ReKi)           			 :: VS_Rgn2K                               			! Generator torque constant in Region 2 (HSS side), N-m/(rad/s)^2.
+REAL(ReKi), PARAMETER           :: VS_Rgn2Sp     =      91.21091                   ! Transitional generator speed (HSS side) between regions 1 1/2 and 2, rad/s.
+REAL(ReKi)           			 :: VS_RtGnSp                         				! Rated generator speed (HSS side), rad/s. -- cequal to 99% of PC_RefSpd
+REAL(ReKi)           			 :: VS_RtPwr                            			! Rated generator generator power in Region 3, Watts. -- chosen to be 5MW divided by the electrical generator efficiency of 94.ReKi%
+REAL(ReKi)                		 :: VS_Slope15                                      ! Torque/speed slope of region 1 1/2 cut-in torque ramp , N-m/(rad/s).
+REAL(ReKi)                		 :: VS_Slope25                                      ! Torque/speed slope of region 2 1/2 induction generator, N-m/(rad/s).
+REAL(ReKi), PARAMETER           :: VS_SlPc       =      10.0                       ! Rated generator slip percentage in Region 2 1/2, %.
+REAL(ReKi)                		 :: VS_SySp                                         ! Synchronous speed of region 2 1/2 induction generator, rad/s.
+REAL(ReKi)                		 :: VS_TrGnSp                                       ! Transitional generator speed (HSS side) between regions 2 and 2 1/2, rad/s.
+REAL(ReKi)                		 :: PC_RefSpd 										! Desired (reference) HSS speed for pitch controller, rad/s.
+REAL(ReKi)                		 :: PC_MinPit										! Minimum pitch setting in pitch controller, rad.
+REAL(ReKi)    					 :: BlPitchCom                  					! Commanded blade pitch angle for blade 1 (demand pitch angle), rad.
+! REAL(ReKi), PARAMETER           :: R2D           =      57.295780                  ! Factor to convert radians to degrees.
 
 LOGICAL, SAVE					:: Initialize1 = .TRUE.					!Flag used to initialize some saved variables on the first call to this subroutine
 LOGICAL, SAVE					:: Initialize2 = .TRUE.					!Flag used to initialize some saved variables on the first call to this subroutine
@@ -914,40 +914,43 @@ END SUBROUTINE UserYawCont
 !=======================================================================
 SUBROUTINE getControlParameters( HSS_Spd, ZTime, GenSpeedF_out, PC_RefSpd, PC_MinPit, VS_Rgn2K, VS_RtPwr )
 
+USE								precision
+USE								DerateControl 	! contains variables TimeDRStart, TimeDREnd, and DerateFactor
+												! TimeDRStart: Time for turbine to initiate derating
+												! TimeDREnd: Time for turbine to start returning to full rated operation
+												! DerateFactor: Ammount turbine will be derated (fraction of 1)
+
 IMPLICIT                        NONE
 
    ! Passed Variables:
-REAL(4), INTENT(IN)       		:: HSS_Spd                     ! Current  HSS (generator) speed, rad/s.
-REAL(4), INTENT(IN )      		:: ZTime                        ! Current simulation time, sec.
-REAL(4), INTENT(OUT)      :: GenSpeedF_out                    ! Filtered HSS (generator) speed, rad/s.
-REAL(4), INTENT(OUT)           	:: PC_RefSpd                    ! Desired (reference) HSS speed for pitch controller, rad/s.
-REAL(4), INTENT(OUT)        	:: PC_MinPit     				! Minimum pitch setting in pitch controller, rad.
-REAL(4), INTENT(OUT)           	:: VS_Rgn2K                   	! Generator torque constant in Region 2 (HSS side), N-m/(rad/s)^2.
-REAL(4), INTENT(OUT)           	:: VS_RtPwr                     ! Rated generator generator power in Region 3, Watts. -- chosen to be 5MW divided by the electrical
+REAL(ReKi), INTENT(IN)       		:: HSS_Spd                     ! Current  HSS (generator) speed, rad/s.
+REAL(ReKi), INTENT(IN )      		:: ZTime                        ! Current simulation time, sec.
+REAL(ReKi), INTENT(OUT)      :: GenSpeedF_out                    ! Filtered HSS (generator) speed, rad/s.
+REAL(ReKi), INTENT(OUT)           	:: PC_RefSpd                    ! Desired (reference) HSS speed for pitch controller, rad/s.
+REAL(ReKi), INTENT(OUT)        	:: PC_MinPit     				! Minimum pitch setting in pitch controller, rad.
+REAL(ReKi), INTENT(OUT)           	:: VS_Rgn2K                   	! Generator torque constant in Region 2 (HSS side), N-m/(rad/s)^2.
+REAL(ReKi), INTENT(OUT)           	:: VS_RtPwr                     ! Rated generator generator power in Region 3, Watts. -- chosen to be 5MW divided by the electrical
 
 	! Local variables storing baseline control parameters (FROM the controller described in the NREL 5MW specifications)
-REAL(4), PARAMETER				:: PC_MinPit_baseline     = 0.0        		! Minimum pitch setting in NREL 5MW baseline pitch controller, rad.
-REAL(4), PARAMETER           	:: PC_RefSpd_baseline     = 122.9096        ! Desired (reference) HSS speed for NREL 5MW baseline pitch controller, rad/s.
-REAL(4), PARAMETER           	:: VS_Rgn2K_baseline      = 2.332287        ! Generator torque constant in Region 2 (HSS side) for NREL 5MW baseline controller, N-m/(rad/s)^2.
-REAL(4), PARAMETER           	:: VS_RtGnSp_baseline     = 121.6805        ! Rated generator speed (HSS side) for NREL 5MW baseline controller, rad/s. -- chosen to be 99% of PC_RefSpd
-REAL(4), PARAMETER			    :: VS_RtPwr_baseline      = 5296610.0       ! Rated generator generator power in Region 3 for NREL 5MW baseline controller, Watts. -- chosen to be 5MW divided by tthe electrical generator efficiency of 94.4%
-REAL(4), PARAMETER			    :: VS_Rgn2Sp_baseline	  = 91.21091        ! Transitional generator speed (HSS side) between regions 1 1/2 and 2 for NREL 5MW baseline controller, rad/s.
-REAL(4), PARAMETER			    :: VS_CtInSp_baseline	  = 70.16224        ! Transitional generator speed (HSS side) between regions 1 and 1 1/2 for NREL 5MW baseline controller, rad/s.
+REAL(ReKi), PARAMETER				:: PC_MinPit_baseline     = 0.0        		! Minimum pitch setting in NREL 5MW baseline pitch controller, rad.
+REAL(ReKi), PARAMETER           	:: PC_RefSpd_baseline     = 122.9096        ! Desired (reference) HSS speed for NREL 5MW baseline pitch controller, rad/s.
+REAL(ReKi), PARAMETER           	:: VS_Rgn2K_baseline      = 2.332287        ! Generator torque constant in Region 2 (HSS side) for NREL 5MW baseline controller, N-m/(rad/s)^2.
+REAL(ReKi), PARAMETER           	:: VS_RtGnSp_baseline     = 121.6805        ! Rated generator speed (HSS side) for NREL 5MW baseline controller, rad/s. -- chosen to be 99% of PC_RefSpd
+REAL(ReKi), PARAMETER			    :: VS_RtPwr_baseline      = 5296610.0       ! Rated generator generator power in Region 3 for NREL 5MW baseline controller, Watts. -- chosen to be 5MW divided by tthe electrical generator efficiency of 94.ReKi%
+REAL(ReKi), PARAMETER			    :: VS_Rgn2Sp_baseline	  = 91.21091        ! Transitional generator speed (HSS side) between regions 1 1/2 and 2 for NREL 5MW baseline controller, rad/s.
+REAL(ReKi), PARAMETER			    :: VS_CtInSp_baseline	  = 70.16224        ! Transitional generator speed (HSS side) between regions 1 and 1 1/2 for NREL 5MW baseline controller, rad/s.
 
 	!Local variables used to filter generator speed
-REAL(4)                      :: Alpha                                           ! Current coefficient in the recursive, single-pole, low-pass filter, (-).
-REAL(4), SAVE                :: LastTime                                        ! Last time this subroutine was called, sec.
-REAL(4), PARAMETER           :: CornerFreq    =       1.570796                  ! Corner frequency (-3dB point) in the recursive, single-pole, low-pass filter, rad/s. -- chosen to be 1/4 the blade edgewise natural frequency ( 1/4 of approx. 1Hz = 0.25Hz = 1.570796rad/s)
+REAL(ReKi)                      :: Alpha                                           ! Current coefficient in the recursive, single-pole, low-pass filter, (-).
+REAL(ReKi), SAVE                :: LastTime                                        ! Last time this subroutine was called, sec.
+REAL(ReKi), PARAMETER           :: CornerFreq    =       1.570796                  ! Corner frequency (-3dB point) in the recursive, single-pole, low-pass filter, rad/s. -- chosen to be 1/4 the blade edgewise natural frequency ( 1/4 of approx. 1Hz = 0.25Hz = 1.570796rad/s)
 
 	!Local variables used for derate calculations
-REAL(4), PARAMETER				:: DR = 0.2								!The magnitude of the derate command (0 to 1)	
-REAL(4), PARAMETER              :: t_DRstart = 150.0 					! Time when the derate command will be issued.
-REAL(4), PARAMETER              :: t_DRend = 250.0 						! Time when the end derate command will be issued. 
-REAL(4), PARAMETER				:: pDR = 0.2							!- poles of the second order derate input filter.
-REAL(4), SAVE                   :: FF_pwrFactor = 1.0 					! The derate factor. A fraction of 1, where 1 is not derated.
+REAL(ReKi), PARAMETER				:: pDR = 0.2							!- poles of the second order derate input filter.
+REAL(ReKi), SAVE                   :: FF_pwrFactor = 1.0 					! The derate factor. A fraction of 1, where 1 is not derated.
 
 LOGICAL, SAVE					:: Initialize = .TRUE.					!Flag used to initialize some saved variables on the first call to this subroutine
-REAL(4), SAVE      :: GenSpeedF                    ! Filtered HSS (generator) speed, rad/s.
+REAL(ReKi), SAVE      :: GenSpeedF                    ! Filtered HSS (generator) speed, rad/s.
 
 
 !=======================================================================
@@ -972,12 +975,12 @@ REAL(4), SAVE      :: GenSpeedF                    ! Filtered HSS (generator) sp
 		GenSpeedF = ( 1.0 - Alpha )*HSS_Spd + Alpha*GenSpeedF
 !=======================================================================
 	!Derate Calculations
-	IF (ZTime >= t_DRend) THEN
+	IF (ZTime >= TimeDREnd) THEN
 		!return turbine to normal operation
-		FF_pwrFactor = 1.0 - DR + DR*(1.0 - pDR*(ZTime - t_DRend)*EXP(-pDR*(ZTime - t_DRend)) - EXP(-pDR*(ZTime - t_DRend)))
-	ELSEIF (ZTime >= t_DRstart) THEN
+		FF_pwrFactor = 1.0 - DerateFactor + DerateFactor*(1.0 - pDR*(ZTime - TimeDREnd)*EXP(-pDR*(ZTime - TimeDREnd)) - EXP(-pDR*(ZTime - TimeDREnd)))
+	ELSEIF (ZTime >= TimeDRStart) THEN
 		!Derate turbine
-		FF_pwrFactor = 1.0 - DR*(1.0 - pDR*(ZTime - t_DRstart)*EXP(-pDR*(ZTime - t_DRstart)) - EXP(-pDR*(ZTime - t_DRstart)))
+		FF_pwrFactor = 1.0 - DerateFactor*(1.0 - pDR*(ZTime - TimeDRStart)*EXP(-pDR*(ZTime - TimeDRStart)) - EXP(-pDR*(ZTime - TimeDRStart)))
 	ENDIF
 !=======================================================================
 	! Set pitch control parameters

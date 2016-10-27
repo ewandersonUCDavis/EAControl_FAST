@@ -2557,6 +2557,7 @@ USE                             TipBrakes
 USE                             Tower
 USE                             TurbConf
 USE                             TurbCont
+use								DerateControl
 
 IMPLICIT                        NONE
 
@@ -3890,6 +3891,28 @@ CALL ReadCVar ( UnIn, PriFile, LinFile, 'LinFile', 'Name of file containing FAST
 IF ( LEN_TRIM( LinFile ) == 0 .AND. AnalMode /= 1)  CALL ProgAbort ( ' LinFile must not be an empty string.' )
 IF ( PathIsRelative( LinFile ) ) LinFile = TRIM(PriPath)//TRIM(LinFile)
 
+
+!  -------------- DERATE PARAMETERS --------------------------------------------
+
+
+   ! Skip the comment line.
+
+   CALL ReadCom ( UnIn, PriFile, 'derate parameters' )
+   
+   
+   ! TimeDRStart - Time for turbine to initiate derating
+   
+CALL ReadRVar ( UnIn, PriFile, TimeDRStart, 'TimeDRStart', 'Time for turbine to initiate derating' )
+
+   ! TimeDREnd - Time for turbine to start returning to full rated operation
+   
+CALL ReadRVar ( UnIn, PriFile, TimeDREnd, 'TimeDREnd', 'Time for turbine to start returning to full rated operation' )
+
+   ! DerateFactor - Ammount turbine will be derated
+   
+CALL ReadRVar ( UnIn, PriFile, DerateFactor, 'DerateFactor', 'Ammount turbine will be derated' )
+
+   
 
 !  -------------- OUTPUT PARAMETERS --------------------------------------------
 
