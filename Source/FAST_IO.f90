@@ -3912,7 +3912,13 @@ CALL ReadRVar ( UnIn, PriFile, TimeDREnd, 'TimeDREnd', 'Time for turbine to star
    
 CALL ReadRVar ( UnIn, PriFile, DerateFactor, 'DerateFactor', 'Ammount turbine will be derated' )
 
+    ! TEmShutdown - Time to initiate an emergency shutdown
    
+CALL ReadRVar ( UnIn, PriFile, TEmShutdown, 'TEmShutdown', 'Time to initiate emergency shutdown' )
+
+   ! maxOverspeed - The maximum safe overspeed (%).
+   
+CALL ReadRVar ( UnIn, PriFile, maxOverspeed, 'maxGenOS', 'The maximum safe overspeed (%).' )  
 
 !  -------------- OUTPUT PARAMETERS --------------------------------------------
 

@@ -23,6 +23,7 @@ USE                             SimCont
 USE                             Tower
 USE                             TurbConf
 USE                             TurbCont
+USE                             EAControl
 
 USE                             NOISE !AllocNoise
 
