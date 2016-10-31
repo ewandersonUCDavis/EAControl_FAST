@@ -57,7 +57,7 @@ SUBROUTINE PitchCntrl ( BlPitch, ElecPwr, HSS_Spd, GBRatio, TwrAccel, NumBl, ZTi
    ! outlined in Eric's dissertaion. Derating is achieved by using subroutine ControlParameters() to scale
    ! relevant control parameters.
 USE								precision
-USE								EAControl 	! contains variables: TimeDRStart, TimeDREnd, DerateFactor, TEmShutdown, maxOverspeed, EmergencyShutdown, GenSpeedF, PC_RefSpd, PC_MinPit, VS_Rgn2K, and VS_RtPwr. See EAControl module in FAST_Mods.f90 for variable descriptions.
+USE								EAControl 	! contains variables: TimeDRStart, TimeDREnd, DerateFactor, TEmShutdown, maxOverspeed, EmergencyShutdown, GenSpeedF, PC_RefSpd, PC_MinPit, VS_Rgn2_K, and VS_RtPwr. See EAControl module in FAST_Mods.f90 for variable descriptions.
 
 
 IMPLICIT                        NONE
@@ -132,7 +132,7 @@ IF ( ( ZTime*OnePlusEps - LastTimePC ) >= PC_DT )  THEN
 	CALL updateControlParameters( HSS_Spd, ZTime )
 	
 	IF ( EmergencyShutdown ) THEN
-		PitComT = pi/2
+		PitComT = 3.1415926535/2
 	ELSE
 	   ! Compute the gain scheduling correction factor based on the previously
 	   !   commanded pitch angle for blade 1:
@@ -275,7 +275,7 @@ SUBROUTINE UserHSSBr ( GenTrq, ElecPwr, HSS_Spd, GBRatio, NumBl, ZTime, DT, DirR
 
 USE                             Precision
 USE								EAControl 	! contains LOGICAL variable EmergencyShutdown.
-USE								DriveTrain
+! USE								DriveTrain
 
 
 IMPLICIT                        NONE
@@ -297,12 +297,14 @@ CHARACTER(1024), INTENT(IN ) :: DirRoot                                         
 
 REAL(ReKi), SAVE			:: brakeStartTime									! Time when HHS Brake is initiated.
 LOGICAL, SAVE				:: brakeOff = .TRUE.
+REAL(ReKi), PARAMETER		:: HSSBrDT = 0.6									! Time it takes for HSS brake to reach full deployment once deployed.
+	
+IF  ( ( EmergencyShutdown ) .AND. ( GenSpeedF < 1 ) ) THEN ! If emergency shutdown has been initiated and generator speed is almost zero.
 
-IF  ( ( EmergencyShutdown ) .AND. ( abs(GenSpeedF) < 1 ) ) THEN ! If emergency shutdown has been initiated and generator speed is almost zero.
 	IF ( brakeOff ) THEN
 		brakeStartTime = ZTime
 		brakeOff = .FALSE.
-		WRITE(*,*)  'HSS Brake initiated.' 
+		WRITE(*,*)  'HSS Brake initiated at T =',ZTime,' GenSpeedF =',GenSpeedF
 		HSSBrFrac = 0.0 
 	ELSEIF ( (ZTime-brakeStartTime) < HSSBrDT ) THEN
 		HSSBrFrac = (ZTime-brakeStartTime)/HSSBrDT
@@ -650,7 +652,7 @@ SUBROUTINE UserVSCont ( HSS_Spd, GBRatio, NumBl, ZTime, DT, GenEff, DelGenTrq, D
 
 USE								precision
 USE  							Output
-USE								EAControl 	! contains variables: TimeDRStart, TimeDREnd, DerateFactor, TEmShutdown, maxOverspeed, EmergencyShutdown, GenSpeedF, PC_RefSpd, PC_MinPit, VS_Rgn2K, and VS_RtPwr. See EAControl module in FAST_Mods.f90 for variable descriptions.
+USE								EAControl 	! contains variables: TimeDRStart, TimeDREnd, DerateFactor, TEmShutdown, maxOverspeed, EmergencyShutdown, GenSpeedF, PC_RefSpd, PC_MinPit, VS_Rgn2_K, and VS_RtPwr. See EAControl module in FAST_Mods.f90 for variable descriptions.
 
 IMPLICIT                        NONE
 
@@ -726,9 +728,9 @@ IF ( ( ZTime*OnePlusEps - LastTimeVS ) >= VS_DT )  THEN
 	   ! Determine some torque control parameters not specified directly:
 		VS_RtGnSp = 0.99*PC_RefSpd
 		VS_SySp    = VS_RtGnSp/( 1.0 +  0.01*VS_SlPc )
-		VS_Slope15 = ( VS_Rgn2K*VS_Rgn2Sp*VS_Rgn2Sp )/( VS_Rgn2Sp - VS_CtInSp )
+		VS_Slope15 = ( VS_Rgn2_K*VS_Rgn2Sp*VS_Rgn2Sp )/( VS_Rgn2Sp - VS_CtInSp )
 		VS_Slope25 = ( VS_RtPwr/VS_RtGnSp           )/( VS_RtGnSp - VS_SySp   )
-		VS_TrGnSp = ( VS_Slope25 - SQRT( VS_Slope25*( VS_Slope25 - 4.0*VS_Rgn2K*VS_SySp ) ) )/( 2.0*VS_Rgn2K ) !Transition speed from region 2 to region 2.5
+		VS_TrGnSp = ( VS_Slope25 - SQRT( VS_Slope25*( VS_Slope25 - 4.0*VS_Rgn2_K*VS_SySp ) ) )/( 2.0*VS_Rgn2_K ) !Transition speed from region 2 to region 2.5
 
 		BlPitchCom =  AllOuts(PtchPMzc1)/R2D
 	   ! Compute the generator torque, which depends on which region we are in:
@@ -740,7 +742,7 @@ IF ( ( ZTime*OnePlusEps - LastTimeVS ) >= VS_DT )  THEN
 		  ELSEIF ( GenSpeedF <  VS_Rgn2Sp )  THEN                                    ! We are in region 1 1/2 - linear ramp in torque from zero to optimal
 			 GenTrq = VS_Slope15*( GenSpeedF - VS_CtInSp )
 		  ELSEIF ( GenSpeedF <  VS_TrGnSp )  THEN                                    ! We are in region 2 - optimal torque is proportional to the square of the generator speed
-			 GenTrq = VS_Rgn2K*GenSpeedF*GenSpeedF
+			 GenTrq = VS_Rgn2_K*GenSpeedF*GenSpeedF
 		  ELSE                                                                       ! We are in region 2 1/2 - simple induction generator transition region
 			 GenTrq = VS_Slope25*( GenSpeedF - VS_SySp   )
 		  ENDIF
@@ -936,7 +938,7 @@ END SUBROUTINE UserYawCont
 SUBROUTINE updateControlParameters( HSS_Spd, ZTime )
 
 USE								precision
-USE								EAControl 	! contains variables: TimeDRStart, TimeDREnd, DerateFactor, TEmShutdown, maxOverspeed, EmergencyShutdown, GenSpeedF, PC_RefSpd, PC_MinPit, VS_Rgn2K, and VS_RtPwr. See EAControl module in FAST_Mods.f90 for variable descriptions.
+USE								EAControl 	! contains variables: TimeDRStart, TimeDREnd, DerateFactor, TEmShutdown, maxOverspeed, EmergencyShutdown, GenSpeedF, PC_RefSpd, PC_MinPit, VS_Rgn2_K, and VS_RtPwr. See EAControl module in FAST_Mods.f90 for variable descriptions.
 
 IMPLICIT                        NONE
 
@@ -1000,12 +1002,15 @@ LOGICAL, SAVE					:: Initialize = .TRUE.					!Flag used to initialize some saved
 	PC_MinPit = PC_MinPit_baseline !correct this later
 !=======================================================================
 	! Set torque control parameters	
-	VS_Rgn2K = VS_Rgn2K_baseline/(FF_pwrFactor**2) 	! Region 2 torque constant
+	VS_Rgn2_K = VS_Rgn2K_baseline/(FF_pwrFactor**2) 	! Region 2 torque constant
 	VS_RtPwr = VS_RtPwr_baseline*FF_pwrFactor		! Rated power
 !=======================================================================
 	! Check to see if emergency shutdown should be initiated
-	IF ( ( ZTime > TEmShutdown ) .OR. ( (100*HSS_Spd/PC_RefSpd_baseline) .GE. maxOverspeed)) THEN
-		EmergencyShutdown = .TRUE.
+	IF ((ZTime > 30.0) .AND. (EmergencyShutdown == .FALSE.)) THEN ! If simulation has run long enough to pass the initial transient behavior and an emergency shutdown hasn't been requested yet. 
+		IF ( ( ZTime > TEmShutdown ) .OR. ( (100*(HSS_Spd-PC_RefSpd_baseline)/PC_RefSpd_baseline) .GE. maxOverspeed)) THEN ! Should an emergency shutdown be requested now?
+			EmergencyShutdown = .TRUE.
+			WRITE(*,*)  'Emergency shutdown requested at T =',ZTime, ' Overspeed =',(100*(HSS_Spd-PC_RefSpd_baseline)/PC_RefSpd_baseline) 
+		ENDIF
 	ENDIF
 !=======================================================================
 ! Reset the value of LastTime to the current value:
