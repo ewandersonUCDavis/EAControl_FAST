@@ -1,0 +1,15 @@
+Notes on runnig FAST with the control subroutines written by Eric Anderson.
+
+-Set the following inputs:
+1        PCMode
+2        VSContrl
+2        HSSBrMode
+0.0      THSSBrDp ! Turns on the user defined HSS brake model at this time
+
+-Copy the following lines into the primary.fst input file after the Linearization control subsection and change values based on current simulation:
+---------------------- DERATE PARAMETERS --------------------------------------------------
+ 9999.9		TimeDRStart 	-Time for turbine to initiate derating
+ 9999.9		TimeDREnd		-Time for turbine to start returning to full rated operation
+ 0.1		DerateFactor	-Ammount turbine will be derated (fraction of 1)
+ 9999.9		TEmShutdown		-Time to initiate an emergency shutdown of the turbine
+ 15.0		maxOverspeed	-The maximum safe overspeed (%). An overspeed larger than this will initiate an emergency shutdown.
