@@ -2557,7 +2557,7 @@ USE                             TipBrakes
 USE                             Tower
 USE                             TurbConf
 USE                             TurbCont
-use								DerateControl
+use								EAControl
 
 IMPLICIT                        NONE
 

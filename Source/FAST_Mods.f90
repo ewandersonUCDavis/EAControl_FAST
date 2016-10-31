@@ -2650,7 +2650,7 @@ LOGICAL				 			:: EmergencyShutdown = .FALSE.					! The signal instructing the t
 REAL(ReKi)      				:: GenSpeedF                    				! Filtered HSS (generator) speed, rad/s.
 REAL(ReKi)       				:: PC_RefSpd                    				! Desired (reference) HSS speed for pitch controller, rad/s.
 REAL(ReKi)       				:: PC_MinPit     								! Minimum pitch setting in pitch controller, rad.
-REAL(ReKi)       				:: VS_Rgn2K                   					! Generator torque constant in Region 2 (HSS side), N-m/(rad/s)^2.
+REAL(ReKi)       				:: VS_Rgn2_K                   					! Generator torque constant in Region 2 (HSS side), N-m/(rad/s)^2.
 REAL(ReKi)         				:: VS_RtPwr                     				! Rated generator generator power in Region 3, Watts. -- chosen to be 5MW divided by the electrical
 
 
