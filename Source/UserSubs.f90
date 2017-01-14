@@ -962,6 +962,8 @@ REAL(ReKi), PARAMETER           :: CornerFreq    =       1.570796               
 	!Local variables used for derate calculations
 REAL(ReKi), PARAMETER				:: pDR = 0.2							!- poles of the second order derate input filter.
 REAL(ReKi), SAVE                   :: FF_pwrFactor = 1.0 					! The derate factor. A fraction of 1, where 1 is not derated.
+REAL(ReKi), DIMENSION (17), PARAMETER	:: DRPitchArray = (/ 6.7500, 6.2500, 5.7500, 5.2500, 4.7500, 4.2500, 3.7500, 3.5000, 3.0000, 2.5000, 2.2500, 2.0000, 1.7500, 1.5000, 1.2500, 0.7500, 0 /)
+REAL(ReKi), DIMENSION (17), PARAMETER	:: DRArray      = (/ 0.5789, 0.6184, 0.6579, 0.6974, 0.7368, 0.7763, 0.8158, 0.8289, 0.8684, 0.9079, 0.9211, 0.9342, 0.9474, 0.9605, 0.9737, 0.9868, 1.0000 /)
 
 LOGICAL, SAVE					:: Initialize = .TRUE.					!Flag used to initialize some saved variables on the first call to this subroutine
 
@@ -1000,7 +1002,13 @@ LOGICAL, SAVE					:: Initialize = .TRUE.					!Flag used to initialize some saved
 !=======================================================================
 	! Set pitch control parameters
 	PC_RefSpd = PC_RefSpd_baseline*FF_pwrFactor
-	PC_MinPit = PC_MinPit_baseline !correct this later
+DO Index = 2, size(DRPitchArray)
+	IF ( (FF_pwrFactor > DRArray(Index-1) ) .AND. (FF_pwrFactor < DRArray(Index) ) THEN 
+		PC_MinPit = DRPitchArray(Index-1) +  ( DRPitchArray(Index) - DRPitchArray(Index-1) )*( FF_pwrFactor - DRArray(Index-1) )/( DRArray(Index) - DRArray(Index-1) )
+		WRITE(*,*) 'PowerFactor = ',FF_pwrFactor,'  PC_MinPit =',PC_MinPit
+	ENDIF
+ENDDO
+	!PC_MinPit = PC_MinPit_baseline !correct this later
 !=======================================================================
 	! Set torque control parameters	
 	VS_Rgn2_K = VS_Rgn2K_baseline/(FF_pwrFactor**2) 	! Region 2 torque constant
